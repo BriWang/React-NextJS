@@ -28,7 +28,7 @@ The same issue is visible in social platforms such as Facebook — when sharing 
 
 One solution is to create a **Server-side rendering app**. Two most popular framework that provides SSR for React is **Next.js** and **Gatsby**.
 
-## Build fullstack apps 
+## Key feature 3 - Build fullstack apps 
 
 You can store data, get data, authentication etc, in your React app.
 
