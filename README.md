@@ -37,3 +37,10 @@ You can store data, get data, authentication etc, in your React app.
 Any file inside the folder pages/api is mapped to /api/* and will be treated as an API endpoint instead of a page. They are **server-side only** bundles and won't increase your client-side bundle size.
 
 https://nextjs.org/docs/api-routes/introduction
+
+
+## Code Practice
+
+You can play around File-base system in this basic project.
+
+To run the project, `npm run dev`.
