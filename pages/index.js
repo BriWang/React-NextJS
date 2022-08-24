@@ -1,25 +1,60 @@
 // http://localhost:3000/
 
-import Link from 'next/link';
+import MainNavigation from '../components/layout/MainNavigation';
+import MeetupList from '../components/meetups/MeetupList';
 import { Fragment } from 'react';
 
-function Home() {
+
+const DUMMY_DATA = [
+  {
+    id: 'm1',
+    title: 'First Meet Up',
+    image: 'https://maxmyprofit.com.au/blog/wp-content/uploads/2015/01/adolescent-adult-blur-933964-e1606098865525.jpg',
+    address: 'Test address 5',
+    description: 'This is the first meet up.'
+  },
+  {
+    id: 'm2',
+    title: 'Second Meet Up',
+    image: 'https://maxmyprofit.com.au/blog/wp-content/uploads/2015/01/adolescent-adult-blur-933964-e1606098865525.jpg',
+    address: 'Test address 15',
+    description: 'This is the second meet up.'
+  }
+]
+
+function Home(props) {
   return (
     <Fragment>
-      <h1>The Home page</h1>
-      <ul>
-        <li>
-          <Link href='/news'>The News page</Link>
-        </li>
-        <li>
-          <Link href='/anotherpage'>The another page</Link>
-        </li>
-        <li>
-          <Link href='/anotherpage/{newsId}'>The dynamic page</Link>
-        </li>
-      </ul>
+      <MeetupList meetups={props.meetups} />
     </Fragment>
-  );  
+  );
 }
 
 export default Home;
+
+
+export async function getStaticProps() {
+  /*
+  fetch data from API
+    ...
+    ...
+
+  return {
+    props: {
+      meetups: meetups.map((meetup) => ({
+        title: meetup.title,
+        address: meetup.address,
+        image: meetup.image,
+        id: meetup._id.toString(),
+      })),
+    },
+    revalidate: 1,
+  }
+  */
+
+  return {
+    props: {
+      meetups: DUMMY_DATA
+    }
+  }
+}
