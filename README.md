@@ -1,46 +1,115 @@
 # React-NextJS
 
-<img width="1143" alt="image" src="https://user-images.githubusercontent.com/38158251/186341470-9d47c317-6e8c-4021-b778-b685033ed958.png">
+## SSR - Server-Side Rendering
 
-## Key feature 1 - File-based routing
+**getServerSideProps**
+- only runs on server-side and never on the client
+- runs at request time, and this page will be pre-rendered with the returned props
+- can only be exported from a page
 
-Use file system for routing. See Code Practice project for details.
+**Usage**
+- only if you need to render a page whose data must be fetched at request time.
+- such as authorization headers or geo location
 
-## Key feature 2 - Server-side rendering
+```
+export async function getServerSideProps(context) {
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
+```
 
-#### Issues of Client-Side Rendering
+## SSG - Static Site Generation
 
-**Issue 1** 
+**getStaticProps**
+- always runs on the server and never on the client (alwasy run during `next build`/`npm run build`)
+- pre-render page at build time
 
-When runing a React app, the browser render the index.html(which is pretty much an empty page that contains <App />). Then, the browser will render the components inside <App /> and fetch some data if needed. This might take a few seconds, but could be an issue if end users are using old generation devices or having slow internet.
+**Usage**
+- The data required to render the page is available at build time ahead of a user’s request
+- The data comes from a headless CMS
+- The page must be pre-rendered (for SEO) and be very fast — getStaticProps generates HTML and JSON files, both of which can be cached by a CDN for performance
+- The data can be publicly cached (not user-specific).
 
-**Issue 2**
+```
+export async function getStaticProps(context) {
+  return {
+    props: {}, // will be passed to the page component as props
+  }
+}
+```
 
-It's hard for **Search Engine(SEO)** and **social networks presence**. 
+### getStaticPaths
 
-Currently, of all the search engines only Google has limited capabilities to render and JS site before indexing it. In addition, while Google will be able to render the index page of your website it is known to have issues navigating around sites with a router implementation.
+If a page has **Dynamic Routes** and uses `getStaticProps`, it needs to define a list of paths to be statically generated.
 
-This means that your site will have very hard time trying to get top position in the search results in anything but Google.
+```
+// pages/posts/[id].js
 
-The same issue is visible in social platforms such as Facebook — when sharing a link to your site neither the title nor the thumbnail will render properly.
+// Generates `/posts/1` and `/posts/2`
 
-#### Solution
+export async function getStaticPaths() {
+  return {
+    paths: [{ params: { id: '1' } }, { params: { id: '2' } }],
+    fallback: false,    // can also be true or 'blocking'
+  }
+}
 
-One solution is to create a **Server-side rendering app**. Two most popular framework that provides SSR for React is **Next.js** and **Gatsby**.
+// `getStaticPaths` requires using `getStaticProps`
 
-## Key feature 3 - Build fullstack apps 
+export async function getStaticProps(context) {
+  return {
+    // Passed to the page component as props
+    props: { post: {} },
+  }
+}
 
-You can store data, get data, authentication etc, in your React app.
+export default function Post({ post }) {
+  // Render post...
+}
+```
 
-**API Routes** provide a solution to build your API with Next.js.
+- `fallback: false`
+Any paths not returned by getStaticPaths will result in a 404 page.
 
-Any file inside the folder pages/api is mapped to /api/* and will be treated as an API endpoint instead of a page. They are **server-side only** bundles and won't increase your client-side bundle size.
+- `fallback: true`
+Any paths not returned by getStaticPaths will first show a loading skeleton while the page is being built instead, then the page with data(fetched from getStaticProps)
 
-https://nextjs.org/docs/api-routes/introduction
+- `fallback: blocking`
+Any paths not returned by getStaticPaths will make the user wait without any response until the page with data(fetched from getStaticProps) is rendered.
 
+## ISR - Incremental Static Regeneration
+
+It allows you to create or update static pages **after** you’ve built your site, without needing to rebuild the entire site.
+
+**Usage**
+
+add the `revalidate` prop to `getStaticProps`:
+
+```
+// This function gets called at build time on server-side.
+// It may be called again, on a serverless function, if
+// revalidation is enabled and a new request comes in
+
+export async function getStaticProps() {
+  const res = await fetch('https://.../posts')
+  const posts = await res.json()
+
+  return {
+    props: {
+      posts,
+    },
+    revalidate: 10, // In seconds                                 
+                      // Next.js will attempt to re-generate the page:
+                        // - When a request comes in
+                     // - At most once every 10 seconds
+    
+  }
+}
+```
 
 ## Code Practice
 
-You can play around File-base system in this basic project.
+In this project, you will convert a React app to Next.js app by applying some of the key functions to the app. 
 
 To run the project, `npm run dev`.
